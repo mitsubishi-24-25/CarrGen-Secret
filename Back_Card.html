@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front Card (SF9)</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="Toast.css">
+    <link rel="stylesheet" href="root.css">
+
+    <style>
+        body {
+            background: var(--background-color);
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+        .navbar {
+            z-index: 1060 !important;
+            font-family: 'Oswald', sans-serif;
+            background: var(--primary-color) !important; 
+        }
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s;
+            padding-top: 0;
+        }
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: 250px;
+                padding-right: 2rem;
+            }
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--secondary-color);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            z-index: 1050;
+            font-family: 'Poppins', sans-serif;
+            padding-top: 60px;
+        }
+        .sidebar.collapsed { transform: translateX(-100%); }
+        @media (min-width: 992px) { .sidebar { transform: translateX(0) !important; } }
+        @media (max-width: 991.98px) { .sidebar { position: absolute; height: 100vh; } }
+        .sidebar .nav-link {
+            border-radius: 5px;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            color: var(--primary-color);
+        }
+        .sidebar .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transform: translateX(5px);
+        }
+        .sidebar .nav-link.active {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+            transform: translateX(5px);
+            pointer-events: none;
+        }
+        .sidebar .nav-item p {
+            font-family: Poppins;
+            font-weight: bold;
+            color: var(--primarydark-color);
+        }
+        #toggleBtn {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        #toggleBtn:hover {
+            background-color: var(--secondary-color) !important;
+            color: var(--primary-color) !important;
+            border-color: var(--secondary-color) !important;
+        }
+        @media (min-width: 992px) { #toggleBtn { display: none; } }
+        .container { padding: 0 15px; overflow: hidden; }
+        #cardContainer { display: inline-block; vertical-align: top; }
+        #printableCard {
+            position: relative;
+            width: 279.4mm;
+            height: 215.9mm;
+            overflow: hidden;
+        }
+        #front-card { width: 100%; height: 100%; }
+        .overlay-text {
+            position: absolute;
+            top: 50px;
+            left: 250px;
+            color: black;
+            font-family: 'Times New Roman';
+            white-space: nowrap;
+            font-size: xx-small;
+        }
+        .overlay-text #Core1_1st { top: 93px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_2nd { top: 107.5px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_3rd { top: 122px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_4th { top: 137px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_5th { top: 151px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_6th { top: 165px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_7th { top: 179px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Core1_8th { top: 194px; left: -199px; position: absolute; font-size: xx-small; }
+
+        .overlay-text #Applied1_1st { top: 223px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_2nd { top: 237px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_3rd { top: 251px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_4th { top: 266px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_5th { top: 280px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_6th { top: 294px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_7th { top: 309px; left: -199px; position: absolute; font-size: xx-small; }
+        .overlay-text #Applied1_8th { top: 323px; left: -199px; position: absolute; font-size: xx-small; }
+
+        .overlay-text #Quarter1_1st { top: 90px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_2nd { top: 104.5px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_3rd { top: 119px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_4th { top: 134px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_5th { top: 147px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_6th { top: 162px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_7th { top: 176px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_8th { top: 189px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_9th { top: 220px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_10th { top: 234px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_11th { top: 248px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_12th { top: 263px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_13th { top: 277px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_14th { top: 291px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_15th { top: 306px; left: 64px; position: absolute; font-size: small; }
+        .overlay-text #Quarter1_16th { top: 320px; left: 64px; position: absolute; font-size: small; }
+
+        .overlay-text #Quarter2_1st { top: 90px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_2nd { top: 104.5px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_3rd { top: 119px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_4th { top: 134px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_5th { top: 147px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_6th { top: 162px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_7th { top: 176px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_8th { top: 189px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_9th { top: 220px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_10th { top: 234px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_11th { top: 248px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_12th { top: 263px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_13th { top: 277px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_14th { top: 291px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_15th { top: 306px; left: 108px; position: absolute; font-size: small; }
+        .overlay-text #Quarter2_16th { top: 320px; left: 108px; position: absolute; font-size: small; }
+
+        .overlay-text #FinalSem1_1st { top: 90px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_2nd { top: 104.5px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_3rd { top: 119px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_4th { top: 134px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_5th { top: 147px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_6th { top: 162px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_7th { top: 176px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_8th { top: 189px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_9th { top: 220px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_10th { top: 234px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_11th { top: 248px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_12th { top: 263px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_13th { top: 277px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_14th { top: 291px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_15th { top: 306px; left: 172px; position: absolute; font-size: small; }
+        .overlay-text #FinalSem1_16th { top: 320px; left: 172px; position: absolute; font-size: small; }
+
+        .overlay-text #GenAve1 { top: 334px; left: 172px; position: absolute; font-size: small; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printableCard, #printableCard * { visibility: visible; }
+            #printableCard {
+                position: absolute;
+                top: 0;
+                left: 0; 
+                width: 279.4mm;
+                height: 215.9mm;
+                margin: 0;
+            }
+            @page { size: letter landscape; margin: 0; }
+        }
+    </style>
+
+    <script src="Adviser_Acc_Security.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-primary shadow-sm fixed-top" data-bs-theme="dark">
+        <div class="container-fluid">
+            <div class="d-flex flex-column flex-lg-row w-100 align-items-start align-items-lg-center justify-content-lg-between">
+                <div class="d-flex align-items-center w-100 w-lg-auto justify-content-start mb-2 mb-lg-0">
+                    <button class="btn btn-outline-secondary me-2 d-lg-none" id="toggleBtn">☰</button>
+                    <span class="navbar-brand mb-0 h1 d-none d-lg-inline">CardGen: From Grade Consolidation to Printable Report Card for Senior High School</span>
+                    <span class="navbar-brand mb-0 h1 d-inline d-lg-none">CardGen 2025</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar collapsed" id="sidebar">
+        <ul class="nav flex-column px-3">
+            <li class="nav-item"><p>School Form 9</p></li>
+            <li class="nav-item"><a class="nav-link" href="front_card.html">Front Card</a></li>
+            <li class="nav-item"><a class="nav-link active fw-bold" href="">Back Card</a></li>
+            <li class="nav-item"><p>Input Data</p></li>
+            <li class="nav-item"><a class="nav-link" href="input_data.html">Input Data</a></li>
+            <li class="nav-item"><a class="nav-link" href="Input_Data_Back.html">Input Data (First Sem)</a></li>
+            <li class="nav-item"><a class="nav-link no-link" href="#">Attendance</a></li>
+            <li class="nav-item"><a class="nav-link no-link" href="#">Core-Values</a></li>
+            <li class="nav-item"><button onclick="logout()" class="nav-link">Logout</button></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="container-fluid container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>Card</h1>
+                    <select id="studentDropdown" class="form-select">
+                        <option value="">Blank (Select Student)</option>
+                    </select>
+                    <br>
+                    <div class="mb-3">
+                        <button id="downloadSingleBtn" class="btn btn-primary me-2">Download Current Card</button>
+                        <button id="downloadAllBtn" class="btn btn-success">Download All Cards</button>
+                    </div>
+                    <div id="progressContainer" class="my-3" style="display:none;">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <p class="text-center mt-2 fw-semibold text-light">Generating PDFs... Please wait</p>
+                    </div>
+                    <div id="previewWrapper"><div id="cardContainer"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        window.addEventListener("beforeprint", () => {
+            const card = document.getElementById("printableCard");
+            if(card) {
+                card.style.transform = "scale(1)";
+                card.style.transformOrigin = "top left";
+            }
+        });
+
+        window.addEventListener("afterprint", () => { scaleCard(); });
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const dropdown = document.getElementById("studentDropdown");
+            const cardContainer = document.getElementById("cardContainer");
+
+            try { cardContainer.innerHTML = await (await fetch("Back_Card_Template.html")).text(); } 
+            catch (err) { console.error("Failed to load template:", err); return; }
+
+            const boysRaw = JSON.parse(localStorage.getItem("sem1GradesData_boys")) || {};
+            const girlsRaw = JSON.parse(localStorage.getItem("sem1GradesData_girls")) || {};
+
+            const boysObj = Array.isArray(boysRaw) ? boysRaw.reduce((acc, curr) => ({ ...acc, ...curr }), {}) : boysRaw;
+            const girlsObj = Array.isArray(girlsRaw) ? girlsRaw.reduce((acc, curr) => ({ ...acc, ...curr }), {}) : girlsRaw;
+
+            const allStudents = { ...boysObj, ...girlsObj };
+
+            dropdown.innerHTML = '<option value="">Blank (Select Student)</option>';
+            Object.keys(allStudents).forEach(name => {
+                const option = document.createElement("option");
+                option.value = name;
+                option.textContent = name;
+                dropdown.appendChild(option);
+            });
+
+            dropdown.addEventListener("change", e => {
+                const name = e.target.value;
+                if (!name) return updateGradesCard(null);
+                const data = allStudents[name];
+                updateGradesCard(data);
+                scaleCard();
+            });
+
+            scaleCard();
+            window.addEventListener("resize", scaleCard);
+            initDownloadButtons();
+        });
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const template = await fetch("Back_Card_Template.html").then(r => r.text());
+            document.getElementById("targetContainer").innerHTML = template;
+
+            const subjectTable = JSON.parse(localStorage.getItem("sem1_SubjectData")) || [];
+            const coreSubjects = subjectTable.slice(1).map(row => row[1] || "");
+            const appliedSubjects = subjectTable.slice(1).map(row => row[2] || "");
+            const subjectIds = ["1st","2nd","3rd","4th","5th","6th","7th","8th"];
+
+            subjectIds.forEach((id, i) => {
+                setText(`Core1_${id}`, coreSubjects[i] || "");
+                setText(`Applied1_${id}`, appliedSubjects[i] || "");
+            });
+        });
+
+        function updateGradesCard(data) {
+            if (!data) return;
+            const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value ?? ""; };
+            const subjectTable = JSON.parse(localStorage.getItem("sem1_SubjectData")) || [];
+            const coreSubjects = subjectTable.slice(1).map(row => row[1] || "");
+            const appliedSubjects = subjectTable.slice(1).map(row => row[2] || "");
+            const subjectIds = ["1st","2nd","3rd","4th","5th","6th","7th","8th"];
+            subjectIds.forEach((id, i) => {
+                setText(`Core1_${id}`, coreSubjects[i] || "");
+                setText(`Applied1_${id}`, appliedSubjects[i] || "");
+            });
+
+            const quarterIds = ["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th","13th","14th","15th","16th"];
+            Object.keys(data.core || {}).forEach((subject, i) => {
+                const core = data.core[subject];
+                const quarterId = quarterIds[i];
+                setText(`Quarter1_${quarterId}`, core["1st Quarter"]);
+                setText(`Quarter2_${quarterId}`, core["2nd Quarter"]);
+                setText(`FinalSem1_${quarterId}`, core["Final Sem"]);
+            });
+
+            Object.keys(data.applied || {}).forEach((subject, i) => {
+                const app = data.applied[subject];
+                const quarterId = quarterIds[i + 8];
+                setText(`Quarter1_${quarterId}`, app["1st Quarter"]);
+                setText(`Quarter2_${quarterId}`, app["2nd Quarter"]);
+                setText(`FinalSem1_${quarterId}`, app["Final Sem"]);
+            });
+
+            setText("GenAve1", data["Gen Ave"]);
+        }
+
+        function scaleCard() {
+            const wrapper = document.getElementById("previewWrapper");
+            const card = document.getElementById("printableCard");
+            if (!wrapper || !card) return;
+            const scale = Math.min(wrapper.clientWidth / card.offsetWidth, 1);
+            card.style.transform = `scale(${scale})`;
+            card.style.transformOrigin = 'top left';
+        }
+
+        window.addEventListener("load", scaleCard);
+        window.addEventListener("resize", scaleCard);
+
+        function initDownloadButtons() {
+            const btnSingle = document.getElementById("downloadSingleBtn");
+            const btnAll = document.getElementById("downloadAllBtn");
+            if (btnSingle) btnSingle.addEventListener("click", downloadSinglePDF);
+            if (btnAll) btnAll.addEventListener("click", downloadAllPDFs);
+        }
+
+        async function captureCard(scale = 3) {
+            const card = document.getElementById("printableCard");
+            if (!card) throw new Error("Printable card not found");
+            const prevTransform = card.style.transform;
+            const prevOrigin = card.style.transformOrigin;
+            card.style.transform = "scale(1)";
+            card.style.transformOrigin = "top left";
+            await new Promise(r => setTimeout(r, 50));
+            const canvas = await html2canvas(card, { scale, useCORS: true, backgroundColor: "#ffffff" });
+            card.style.transform = prevTransform;
+            card.style.transformOrigin = prevOrigin;
+            return canvas.toDataURL("image/jpeg", 0.9);
+        }
+
+        async function downloadSinglePDF() {
+            const dropdown = document.getElementById("studentDropdown");
+            const name = dropdown.value;
+            if (!name) { showToast("Please select a student first."); return; }
+            const boys = JSON.parse(localStorage.getItem("sem1GradesData_boys")) || {};
+            const girls = JSON.parse(localStorage.getItem("sem1GradesData_girls")) || {};
+            const allStudents = { ...boys, ...girls };
+            const data = allStudents[name];
+            if (!data) { showToast("Student data not found."); return; }
+            updateGradesCard(data);
+            await new Promise(r => setTimeout(r, 50));
+            const imgData = await captureCard(3);
+            const pdf = new jspdf.jsPDF("landscape", "mm", "letter");
+            pdf.addImage(imgData, "JPEG", 0, 0, 279.4, 215.9);
+            pdf.save(`${name}_Card.pdf`);
+        }
+
+        async function downloadAllPDFs() {
+            const boys = JSON.parse(localStorage.getItem("sem1GradesData_boys")) || {};
+            const girls = JSON.parse(localStorage.getItem("sem1GradesData_girls")) || {};
+            const students = { ...boys, ...girls };
+            const names = Object.keys(students);
+            if (!names.length) { showToast("No student data found."); return; }
+            const pdf = new jspdf.jsPDF("landscape", "mm", "letter");
+            for (let i = 0; i < names.length; i++) {
+                const name = names[i];
+                updateGradesCard(students[name]);
+                await new Promise(r => setTimeout(r, 50));
+                const imgData = await captureCard(3);
+                if (i > 0) pdf.addPage();
+                pdf.addImage(imgData, "JPEG", 0, 0, 279.4, 215.9);
+            }
+            pdf.save("All_Students_Cards.pdf");
+        }
+    </script>
+
+    <script src="SideBar-NavBar.js"></script>
+    <script src="Logout.js"></script>
+    <script src="Toast.js"></script>
+</body>
+</html>
