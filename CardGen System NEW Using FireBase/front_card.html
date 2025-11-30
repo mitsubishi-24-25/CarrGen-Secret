@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front Card (SF9)</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="Toast.css">
+    <link rel="stylesheet" href="root.css">
+
+    <style>
+        body {
+            background: var(--background-color);
+            margin: 0;
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+        }
+        .navbar {
+            z-index: 1060 !important;
+            font-family: 'Oswald', sans-serif;
+            background: var(--primary-color) !important; 
+        }
+        .main-content {
+            margin-left: 0;
+            transition: margin-left 0.3s;
+            padding-top: 0;
+        }
+        @media (min-width: 992px) {
+            .main-content {
+                margin-left: 250px;
+                padding-right: 2rem;
+            }
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--secondary-color);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            z-index: 1050;
+            font-family: 'Poppins', sans-serif;
+            padding-top: 60px;
+        }
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+        @media (min-width: 992px) {
+            .sidebar { transform: translateX(0) !important; }
+        }
+        @media (max-width: 991.98px) {
+            .sidebar { position: absolute; height: 100vh; }
+        }
+        .sidebar .nav-link {
+            border-radius: 5px;
+            transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+            color: var(--primary-color);
+        }
+        .sidebar .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            transform: translateX(5px);
+        }
+        .sidebar .nav-link.active {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            font-weight: bold;
+            transform: translateX(5px);
+            pointer-events: none;
+        }
+        .sidebar .nav-item p {
+            font-family: Poppins;
+            font-weight: bold;
+            color: var(--primarydark-color);
+        }
+        #toggleBtn {
+            color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        #toggleBtn:hover {
+            background-color: var(--secondary-color) !important;
+            color: var(--primary-color) !important;
+            border-color: var(--secondary-color) !important;
+        }
+        @media (min-width: 992px) {
+            #toggleBtn { display: none; }
+        }
+        .container { padding: 0 15px; overflow: hidden; }
+        #cardContainer { display: inline-block; vertical-align: top; }
+        #printableCard {
+            position: relative;
+            width: 279.4mm;  
+            height: 215.9mm;
+            overflow: hidden;
+        }
+        #front-card { width: 100%; height: 100%; }
+        .overlay-text {
+            position: absolute;
+            top: 50px;   
+            left: 250px;
+            color: black;
+            font-family: 'Times New Roman';
+            white-space: nowrap;
+            font-size: smaller;
+        }
+        .overlay-text #studentName { top: 156px; left: 390px; position: absolute; }
+        .overlay-text #studentAge { top: 175px; left: 430px; position: absolute; }
+        .overlay-text #studentSex { top: 175px; left: 610px; position: absolute; }
+        .overlay-text #studentGrade { top: 194px; left: 430px; position: absolute; }
+        .overlay-text #studentSection { top: 194px; left: 630px; position: absolute; }
+        .overlay-text #studentSchoolYear { top: 212px; left: 418px; position: absolute; }
+        .overlay-text #studentLRN { top: 212px; left: 604px; position: absolute; }
+        .overlay-text #studentStrand { top: 242px; left: 410px; position: absolute; font-size: smaller; }
+        .overlay-text #studentTrack { top: 232px; left: 410px; position: absolute; font-size: smaller; }
+        .overlay-text #principalRank { top: 392px; left: 422px; position: absolute; }
+        .overlay-text #principalRank2 { top: 543px; left: 422px; position: absolute; }
+        .overlay-text #principalRank3 { top: 669px; left: 625px; position: absolute; }
+        .overlay-text #principalame { top: 385px; left: 331px; position: absolute; font-weight: bold; }
+        .overlay-text #principalame2 { top: 540px; left: 331px; position: absolute; font-weight: bold; }
+        .overlay-text #principalame3 { top: 669px; left: 535px; position: absolute; font-weight: bold; }
+        .overlay-text #teacherName { top: 385px; left: 565px; position: absolute; font-weight: bold; }
+        .overlay-text #teacherName2 { top: 540px; left: 565px; position: absolute; font-weight: bold; }
+
+        @media print {
+            @page { size: Letter landscape; margin: 0; }
+            body { margin: 0 !important; padding: 0 !important; background: var(--background-color); }
+            body * { visibility: hidden; }
+            #printableCard, #printableCard * { visibility: visible; }
+            #printableCard {
+                position: absolute;
+                top: 0; left: 0;
+                width: 279mm;
+                height: 216mm;
+                margin: 0 auto;
+                page-break-after: auto;
+                page-break-before: auto;
+                page-break-inside: avoid;
+            }
+            #previewWrapper {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+                overflow: hidden;
+                margin: 0 auto;
+                padding: 0;
+            }
+            #previewWrapper > div {
+                transform-origin: top center;
+                transition: transform 0.3s ease;
+                width: 100%;
+                max-width: 1050px;
+                margin: 0 auto;
+                display: inline-block;
+                height: auto;
+            }
+            @media (min-width: 1200px) { #previewWrapper > div { transform: scale(0.8); } }
+            @media (max-width: 1200px) { #previewWrapper > div { transform: scale(0.7); } }
+            @media (max-width: 992px) { #previewWrapper > div { transform: scale(0.6); } }
+            @media (max-width: 768px) { #previewWrapper > div { transform: scale(0.5); } }
+            @media (max-width: 480px) { #previewWrapper > div { transform: scale(0.4); } }
+            #previewWrapper > #printableCard {
+                transform-origin: top left;
+                transition: transform 0.2s ease;
+                display: block;
+                width: 279.4mm;
+                height: 215.9mm;
+            }
+            #cardContainer, #previewWrapper > div {
+                display: block;
+                margin: 0 auto;
+                width: 100%;
+                max-width: 1050px;
+                transform-origin: top left;
+                transition: transform 0.2s ease;
+            }
+        }
+    </style>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+        if (!currentUser || currentUser.role !== "Chris") {
+            window.location.href = "index.html";
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-primary shadow-sm fixed-top" data-bs-theme="dark">
+        <div class="container-fluid">
+            <div class="d-flex flex-column flex-lg-row w-100 align-items-start align-items-lg-center justify-content-lg-between">
+                <div class="d-flex align-items-center w-100 w-lg-auto justify-content-start mb-2 mb-lg-0">
+                    <button class="btn btn-outline-secondary me-2 d-lg-none" id="toggleBtn">☰</button>
+                    <span class="navbar-brand mb-0 h1 d-none d-lg-inline">CardGen: From Grade Consolidation to Printable Report Card for Senior High School</span>
+                    <span class="navbar-brand mb-0 h1 d-inline d-lg-none">CardGen 2025</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="sidebar collapsed" id="sidebar">
+        <ul class="nav flex-column px-3">
+            <li class="nav-item"><p>School Form 9</p></li>
+            <li class="nav-item"><a class="nav-link active fw-bold" href="">Front Card</a></li>
+            <li class="nav-item"><a class="nav-link" href="Back_Card.html">Back Card</a></li>
+            <li class="nav-item"><p>Input Data</p></li>
+            <li class="nav-item"><a class="nav-link" href="input_data.html">Student Information</a></li>
+            <li class="nav-item"><a class="nav-link" href="Input_Data_Back.html">Grades (First Sem)</a></li>
+            <li class="nav-item"><a class="nav-link no link" href="#">Grades (Second Sem)</a></li>
+            <li class="nav-item"><a class="nav-link no-link" href="#">Attendance</a></li>
+            <li class="nav-item"><a class="nav-link no-link" href="#">Core-Values</a></li>
+            <li class="nav-item"><button onclick="logout()" class="nav-link">Logout</button></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="container-fluid container">
+            <div class="row">
+                <div class="col-12">
+                    <h1>Card</h1>
+                    <select id="studentDropdown" class="form-select">
+                        <option value="">Blank (Select Student)</option>
+                    </select>
+                    <br>
+                    <div class="mb-3">
+                        <button id="downloadSingleBtn" class="btn btn-primary me-2">Download Current Card</button>
+                        <button id="downloadAllBtn" class="btn btn-success">Download All Cards</button>
+                    </div>
+                    <div id="progressContainer" class="my-3" style="display:none;">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%">0%</div>
+                        </div>
+                        <p class="text-center mt-2 fw-semibold text-light">Generating PDFs... Please wait</p>
+                    </div>
+                    <div id="previewWrapper"><div id="cardContainer"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const dropdown = document.getElementById("studentDropdown");
+            const cardContainer = document.getElementById("cardContainer");
+
+            const boysRaw = JSON.parse(localStorage.getItem("boysData")) || [];
+            const girlsRaw = JSON.parse(localStorage.getItem("girlsData")) || [];
+            const metadata = JSON.parse(localStorage.getItem("metadataData")) || [];
+
+            const boys = boysRaw.map(s => ({ name: s[0], age: s[1], sex: s[2], lrn: s[3], parentName: s[4], parentNumber: s[5], parentEmail: s[6] }));
+            const girls = girlsRaw.map(s => ({ name: s[0], age: s[1], sex: s[2], lrn: s[3], parentName: s[4], parentNumber: s[5], parentEmail: s[6] }));
+
+            const allStudents = [...boys, ...girls];
+
+            try { cardContainer.innerHTML = await (await fetch("Front_Card_Template.html")).text(); }
+            catch (err) { console.error("Failed to load card template:", err); return; }
+
+            dropdown.innerHTML = '<option value="">Blank (Select Student)</option>';
+            allStudents.forEach(student => { if (student.name?.trim()) { const option = document.createElement("option"); option.value = student.name; option.textContent = student.name; dropdown.appendChild(option); } });
+
+            updateCard(null, metadata);
+            scaleCard();
+
+            dropdown.addEventListener("change", e => {
+                const selectedName = e.target.value;
+                const student = allStudents.find(s => s.name === selectedName);
+                updateCard(student, metadata);
+                scaleCard();
+            });
+
+            initDownloadButtons();
+        });
+
+        function updateCard(student, metadata) {
+            const track = metadata[0]?.[1] || '';
+            const strand = metadata[1]?.[1] || '';
+            const schoolYear = metadata[2]?.[1] || '';
+            const teacherName = metadata[3]?.[1] || '';
+            const principalName = metadata[4]?.[1] || '';
+            const section = metadata[5]?.[1] || '';
+            const studentGrade = metadata[6]?.[1] || '';
+
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || ''; };
+
+            if (!student) {
+                ['studentName','studentAge','studentSex','studentGrade','studentSection','studentSchoolYear','studentLRN','studentTrack','studentStrand','principalame','principalame2','principalame3','teacherName','teacherName2'].forEach(id => set(id, ''));
+                return;
+            }
+
+            set('studentName', student.name || '');
+            set('studentAge', student.age || '');
+            set('studentSex', student.sex || '');
+            set('studentLRN', student.lrn || '');
+            set('studentGrade', studentGrade || '');
+            set('studentSection', section || '');
+            set('studentSchoolYear', schoolYear);
+            set('studentTrack', track);
+            set('studentStrand', strand);
+            ['principalame','principalame2','principalame3'].forEach(id => set(id, principalName));
+            ['teacherName','teacherName2'].forEach(id => set(id, teacherName));
+        }
+
+        function scaleCard() {
+            const wrapper = document.getElementById("previewWrapper");
+            const card = document.getElementById("printableCard");
+            if (!wrapper || !card) return;
+            const scale = Math.min(wrapper.clientWidth / card.offsetWidth, 1);
+            card.style.transform = `scale(${scale})`;
+            card.style.transformOrigin = 'top left';
+        }
+
+            window.addEventListener("load", scaleCard);
+            window.addEventListener("resize", scaleCard);
+
+            function initDownloadButtons() {
+                const btnSingle = document.getElementById("downloadSingleBtn");
+                const btnAll = document.getElementById("downloadAllBtn");
+                if (btnSingle) btnSingle.addEventListener("click", downloadSinglePDF);
+                if (btnAll) btnAll.addEventListener("click", downloadAllPDFs);
+            }
+
+            async function captureCard(scale = 2) {
+                const card = document.getElementById("printableCard");
+                if (!card) throw new Error("Printable card not found");
+                const prevTransform = card.style.transform;
+                const prevOrigin = card.style.transformOrigin;
+                card.style.transform = "scale(1)";
+                card.style.transformOrigin = "top left";
+                await new Promise(r => setTimeout(r, 50));
+                const canvas = await html2canvas(card, { scale, useCORS: true, backgroundColor: "#ffffff" });
+                card.style.transform = prevTransform;
+                card.style.transformOrigin = prevOrigin;
+                return canvas.toDataURL("image/png");
+            }
+
+            function getStudents() {
+                const boysRaw = JSON.parse(localStorage.getItem("boysData")) || [];
+                const girlsRaw = JSON.parse(localStorage.getItem("girlsData")) || [];
+                const boys = boysRaw.map(s => ({ name: s[0], age: s[1], sex: s[2], lrn: s[3], parentName: s[4], parentNumber: s[5], parentEmail: s[6] }));
+                const girls = girlsRaw.map(s => ({ name: s[0], age: s[1], sex: s[2], lrn: s[3], parentName: s[4], parentNumber: s[5], parentEmail: s[6] }));
+                return [...boys, ...girls].filter(s => s.name?.trim());
+            }
+
+            async function downloadSinglePDF() {
+                const dropdown = document.getElementById("studentDropdown");
+                const selectedName = dropdown?.value;
+                if (!selectedName) return showToast("Please select a student first.");
+                const student = getStudents().find(s => s.name === selectedName);
+                if (!student) return showToast("Student not found.");
+                const metadata = JSON.parse(localStorage.getItem("metadataData")) || [];
+                updateCard(student, metadata);
+                const imgData = await captureCard(2);
+                const pdf = new jspdf.jsPDF({ orientation: "landscape", unit: "mm", format: "letter" });
+                pdf.addImage(imgData, "PNG", 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+                pdf.save(`${selectedName.replace(/[\\/:*?"<>|]/g, "_")}_Card.pdf`);
+            }
+
+            async function downloadAllPDFs() {
+                const students = getStudents();
+                if (!students.length) return showToast("No valid student data found!");
+                const metadata = JSON.parse(localStorage.getItem("metadataData")) || [];
+                const pdf = new jspdf.jsPDF({ orientation: "landscape", unit: "mm", format: "letter" });
+                for (let i = 0; i < students.length; i++) {
+                    updateCard(students[i], metadata);
+                    const imgData = await captureCard(2);
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(imgData, "PNG", 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+                }
+                pdf.save("All_Students_Cards.pdf");
+            }
+    </script>
+
+    <script src="SideBar-NavBar.js"></script>
+    <script src="Logout.js"></script>
+    <script src="Toast.js"></script>
+</body>
+</html>

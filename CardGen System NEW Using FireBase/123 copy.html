@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Info Summary</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.min.css">
+    <link rel="stylesheet" href="root.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .hot-container {
+            width: 600px;
+            height: 300px;
+            margin: auto 0 20px 0;
+            border: 1px solid var(--primarydark-color);
+            overflow: auto;
+        }
+        .handsontable thead th .relative {
+            background-color: var(--accent-color);
+            border: 1px solid var(--primarydark-color);
+        }
+        .handsontable table {
+            border-collapse: collapse;
+            border: 1px solid var(--primarydark-color);
+        }
+        .ht_master tb {
+            background-color: var(--accent-color);
+            border: 1px solid var(--primarydark-color);
+        }
+        .header-cell {
+            background-color: #f2f2f2;
+            border: 2px solid #999;
+        }
+        .core-header {
+            background-color: #d0e7ff;
+            border: 2px solid #999;
+        }
+        .applied-header {
+            background-color: #d0ffd6;
+            border: 2px solid #999;
+        }
+        .student-name {
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        .htBold {
+            font-weight: bold;
+        }
+        .htCenter {
+            text-align: center;
+        }
+        .core-subject {
+            background-color: #d0e7ff;
+        }
+        .applied-subject {
+            background-color: #00ff22;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar collapsed" id="sidebar">
+        <ul class="nav flex-column px-3">
+            <li class="nav-item"><p>School Form 9</p></li>
+            <li class="nav-item"><a class="nav-link" href="front_card.html">Front Card</a></li>
+            <li class="nav-item"><a class="nav-link" href="input_data.html">Input Data</a></li>
+            <li class="nav-item"><button onclick="logout()" class="nav-link">Logout</button></li>
+        </ul>
+    </div>
+
+    <h2 style="text-align:center;">Student Metadata Overview</h2>
+    <div id="summaryHot" class="hot-container"></div>
+
+    <h5>Boys Data</h5>
+    <div id="boysHot" class="hot-container student-table"></div>
+
+    <h5>Girls Data</h5>
+    <div id="girlsHot" class="hot-container student-table"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/handsontable@14.3.0/dist/handsontable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const boysNames = JSON.parse(localStorage.getItem("boysData"))?.map(r => r[0].trim()) || [];
+            const girlsNames = JSON.parse(localStorage.getItem("girlsData"))?.map(r => r[0].trim()) || [];
+
+            function createTableData(names, storageKey) {
+                const headerRows = [];
+                const row0 = Array(32).fill("");
+                row0[0] = "Names of Learners";
+                for (let i = 1; i <= 15; i++) row0[i] = "Core Subjects";
+                for (let i = 16; i <= 30; i++) row0[i] = "Applied & Specialized Subjects";
+                row0[31] = "Gen Ave";
+                headerRows.push(row0);
+
+                const row1 = Array(32).fill("");
+                ["1st","2nd","3rd","4th","5th"].forEach((s, idx) => row1[1 + idx*3] = `${s} Subject`);
+                ["1st","2nd","3rd","4th","5th"].forEach((s, idx) => row1[16 + idx*3] = `${s} Subject`);
+                headerRows.push(row1);
+
+                const row2 = Array(32).fill("");
+                for (let i = 1; i <= 30; i += 3) {
+                    row2[i] = "QUARTER";
+                    row2[i+1] = "";
+                    row2[i+2] = "Final Sem";
+                }
+                headerRows.push(row2);
+
+                const row3 = Array(32).fill("");
+                for (let i = 1; i <= 30; i += 3) {
+                    row3[i] = "1";
+                    row3[i+1] = "2";
+                }
+                headerRows.push(row3);
+
+                const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+                const studentRows = names.map(name => {
+                    const row = [name, ...Array(31).fill("")];
+                    const lookup = saved[name];
+                    if (lookup) {
+                        for (let s = 0; s < 10; s++) {
+                            const startCol = 1 + s*3;
+                            const subData = lookup[`Subject ${s+1}`] || {};
+                            row[startCol] = subData["1st Quarter"] || "";
+                            row[startCol+1] = subData["2nd Quarter"] || "";
+                        }
+                    }
+                    return row;
+                });
+
+                return headerRows.concat(studentRows);
+            }
+
+            const mergeCellsConfig = [
+                { row:0, col:0, rowspan:4, colspan:1 },
+                { row:0, col:1, rowspan:1, colspan:15 },
+                { row:0, col:16, rowspan:1, colspan:15 },
+                { row:0, col:31, rowspan:4, colspan:1 },
+                ...[1,4,7,10,13,16,19,22,25,28].map(c => ({ row:1, col:c, rowspan:1, colspan:3 })),
+                ...[1,4,7,10,13,16,19,22,25,28].flatMap(c => [
+                    { row:2, col:c, rowspan:1, colspan:2 },
+                    { row:2, col:c+2, rowspan:2, colspan:1 }
+                ])
+            ];
+
+            const cols = Array(32).fill({ type:'text' });
+
+            function cellReadOnly(instance, row, col) {
+                return row < 4 || col === 0;
+            }
+
+            function cellClassNames(instance, row, col) {
+                if (row < 4) {
+                    if (col >= 1 && col <= 15) return 'htCenter htBold core-header';
+                    if (col >= 16 && col <= 30) return 'htCenter htBold applied-header';
+                    return 'htCenter htBold header-cell';
+                }
+                if (col === 0) return 'student-name';
+                return '';
+            }
+
+            function initTable(container, names, storageKey) {
+                return new Handsontable(container, {
+                    data: createTableData(names, storageKey),
+                    colHeaders: false,
+                    rowHeaders: i => (i >= 4 ? i-3 : ""),
+                    licenseKey: 'non-commercial-and-evaluation',
+                    stretchH: 'all',
+                    mergeCells: mergeCellsConfig,
+                    columns: cols,
+                    cells: (row, col) => ({
+                        readOnly: cellReadOnly(this, row, col),
+                        className: cellClassNames(this, row, col)
+                    }),
+                    manualRowResize: true,
+                    manualColumnResize: true,
+                    afterChange: function(changes, source) {
+                        if (!changes || source === 'loadData') return;
+                        saveGradesToLocalStorage(this, storageKey);
+                    }
+                });
+            }
+
+            function saveGradesToLocalStorage(instance, storageKey) {
+                const grades = {};
+                for (let i = 4; i < instance.countRows(); i++) {
+                    const studentName = instance.getDataAtCell(i, 0)?.trim();
+                    if (!studentName) continue;
+                    grades[studentName] = {};
+                    for (let s = 0; s < 10; s++) {
+                        const startCol = 1 + s*3;
+                        grades[studentName][`Subject ${s+1}`] = {
+                            "1st Quarter": instance.getDataAtCell(i, startCol) || "",
+                            "2nd Quarter": instance.getDataAtCell(i, startCol+1) || ""
+                        };
+                    }
+                }
+                localStorage.setItem(storageKey, JSON.stringify(grades));
+            }
+
+            window.addEventListener('load', () => {
+                initTable(document.getElementById('boysHot'), boysNames, "gradesData_boys");
+                initTable(document.getElementById('girlsHot'), girlsNames, "gradesData_girls");
+            });
+
+            const savedMetadata = JSON.parse(localStorage.getItem('metadataData')) || [];
+            const selectedLabels = ['Adviser:', 'Grade:', 'Section:', 'School Year:', 'Track:', 'Strand:'];
+            const displayData = selectedLabels.map(label => {
+                const found = savedMetadata.find(row => row[0] === label);
+                return [label, found ? (found[1] || '') : ''];
+            });
+
+            new Handsontable(document.getElementById('summaryHot'), {
+                data: displayData,
+                colHeaders: ['Label', 'Value'],
+                rowHeaders: false,
+                licenseKey: 'non-commercial-and-evaluation',
+                stretchH: 'all',
+                colWidths: [150, 400],
+                readOnly: true,
+                cells: (row, col) => ({ readOnly: true, className: col === 0 ? 'htReadOnly htCenter' : '' })
+            });
+        });
+    </script>
+</body>
+</html>
