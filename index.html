@@ -220,7 +220,7 @@ function login() {
 window.onload = () => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser"));
     if (currentUser) {
-        if (currentUser.username === "Adviser") {
+        if (currentUser.username === "Chris") {
             window.location.href = "input_data.html";
         } else if (currentUser.username === "Sub-Teacher") {
             window.location.href = "dashboard_adviser.html";
@@ -389,4 +389,5 @@ togglePasswordIcon.addEventListener("click", function () {
 <script src="Actions Disabled.js"></script>
 
 </body>
+
 </html>
